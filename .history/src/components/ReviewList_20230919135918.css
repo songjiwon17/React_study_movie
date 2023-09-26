@@ -1,0 +1,15 @@
+@charset "utf-8";
+
+*{padding: 0; margin: 0; font-size: 16px;}
+a{text-decoration: none;}
+ul{list-style: none;}
+img{border: none;}
+
+/* ReviewList */
+.ReviewListItem{
+    display: flex;
+    padding: 10px; align-items: center;
+}
+.ReviewListItem-img{
+    width: 200px; height: 300px; object-fit: cover;
+}
