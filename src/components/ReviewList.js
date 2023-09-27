@@ -7,7 +7,6 @@ function formatDate(value){
 
 function ReviewListItem({item, onDelete}){ //
     const handleDeleteClick = ()=>onDelete(item.id);
-
     return(
         <div className="ReviewListItem">
             <img className="ReviewListItem-img" src={item.imgUrl} alt={item.title}/>
