@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 const LIMIT = 6;
 
 function App(){
-    const [items, setItems] = useState([]); //
+    const [items, setItems] = useState([]);
     const [order, setOrder] = useState('createdAt');
-    const [offset, setOffset] = useState(0);
-    const [hasNext, setHasNext] = useState(false);
+    const [offset, setOffset] = useState(0); //offset
+    const [hasNext, setHasNext] = useState(false); //hasNext
 
     const sortedItems = items.sort((a,b)=>b[order] - a[order]);
     const handleNewestClick = () => setOrder('createdAt');
