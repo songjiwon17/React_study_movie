@@ -1,10 +1,9 @@
 import { useState } from "react";
 
-function FileInput(){
-    const [value, setValues] = useState();
-
+function FileInput({name, value, onChange}){
     const handleChange = (e)=>{
-        console.log(e.target.files);
+        const nextValue = e.target.files;
+        onChange(name, nextValue);
     }
 
     return <input type="file" onChange={handleChange}/>
