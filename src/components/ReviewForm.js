@@ -1,6 +1,7 @@
 import { useState } from "react";
 import './ReviewForm.css';
 import FileInput from "./FileInput";
+import RatingInput from "./RatingInput";
 
 function ReviewForm(){
 
@@ -32,7 +33,7 @@ function ReviewForm(){
         <form className="ReviewForm" onSubmit={handleSubmit}>
             <FileInput name={"imgFile"} value={values.imgFile} onChange={handleChange}/>
             <input name='title' value={values.title} onChange={handleInputChange}></input>
-            <input type="number" name="rating" value={values.rating} onChange={handleInputChange}></input>
+            <RatingInput name="rating" value={values.rating} onChange={handleChange}/>
             <textarea name="content" value={values.content} onChange={handleInputChange}></textarea>
             <button type="submit">확인</button>
         </form> 
