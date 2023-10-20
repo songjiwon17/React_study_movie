@@ -12,6 +12,8 @@ const INITIAL_VALUES = {
 }
 
 function ReviewForm(){
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submittingError, setSubmittingError] = useState(null);
 
     const [values, setValues] = useState(INITIAL_VALUES);
 
@@ -36,7 +38,16 @@ function ReviewForm(){
         formData.append('content',values.content);
         formData.append('imgFile',values.imgFile);
 
-        await createReview(formData);
+        try {
+            setSubmittingError(null);
+            setIsSubmitting(true);
+            await createReview(formData);
+        }catch (error){
+            setSubmittingError(error);
+            return;
+        }finally{
+            setIsSubmitting(false);
+        }
         setValues(INITIAL_VALUES);
     }
 
@@ -46,7 +57,8 @@ function ReviewForm(){
             <input name='title' value={values.title} onChange={handleInputChange}></input>
             <RatingInput name="rating" value={values.rating} onChange={handleChange}/>
             <textarea name="content" value={values.content} onChange={handleInputChange}></textarea>
-            <button type="submit">확인</button>
+            <button type="submit" disabled={isSubmitting}>확인</button>
+            {submittingError?.message && <div>{submittingError.message}</div>}
         </form> 
     )
 }
