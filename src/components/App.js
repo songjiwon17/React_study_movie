@@ -1,4 +1,4 @@
-import { getReviews } from "../api";
+import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
 import ReviewList from "./ReviewList";
 import { useEffect, useState } from "react";
@@ -18,9 +18,11 @@ function App(){
     const handleNewestClick = () => setOrder('createdAt');
     const handleBestClick = () => setOrder('rating');
     
-    const handleDelete = (id)=>{ //id를 파라미터로 받아옴 //해당아이디를 가진 요소를 filter를 통해서 걸러낸다.
-        const nextItems = items.filter((item)=>item.id !== id); //!== -> 같지 않으면 true 반환
-        setItems(nextItems);
+    const handleDelete = async (id)=>{ //id를 파라미터로 받아옴 //해당아이디를 가진 요소를 filter를 통해서 걸러낸다.
+        const result = await deleteReview(id);
+        if(!result) return;
+
+        setItems((prevItems)=> prevItems.filter((item)=>item.id !== id));
     }
 
     const handleLoad = async (options) => {
@@ -50,8 +52,15 @@ function App(){
         handleLoad({ order, offset, limit:LIMIT})
     }
 
-    const handleSubmitSuccess = (review)=>{
+    const handleCreateSuccess = (review)=>{
         setItems((prevItems)=> [review, ...prevItems]);
+    }
+
+    const handleUpdateSuccess = (review)=>{
+        setItems((prevItems)=>{
+            const splitIdx = prevItems.findIndex((item)=>item.id === review.id)
+            return [...prevItems.slice(0, splitIdx), review, ...prevItems.slice(splitIdx + 1)]
+        })
     }
 
     useEffect(()=>{
@@ -64,8 +73,8 @@ function App(){
                 <button onClick={handleNewestClick}>최신순</button>
                 <button onClick={handleBestClick}>베스트순</button>
             </div>
-            <ReviewForm onSubmitSuccess={handleSubmitSuccess}/>
-            <ReviewList items={sortedItems} onDelete={handleDelete}/>
+            <ReviewForm onSubmit={createReview} onSubmitSuccess={handleCreateSuccess}/>
+            <ReviewList items={sortedItems} onDelete={handleDelete} onUpdate={updateReview} onUpdateSuccess={handleUpdateSuccess}/>
             {hasNext && <button disabled={isLoading} onClick={handleLoadMore}>더보기</button>}
             {loadingError?.message && <span>{loadingError.message}</span>}
         </div>
