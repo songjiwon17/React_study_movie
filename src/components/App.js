@@ -1,7 +1,8 @@
 import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
 import ReviewList from "./ReviewList";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import useAsync from "./hooks/useAsync";
 
 const LIMIT = 6;
 
@@ -10,8 +11,7 @@ function App(){
     const [order, setOrder] = useState('createdAt');
     const [offset, setOffset] = useState(0); //offset
     const [hasNext, setHasNext] = useState(false); //hasNext
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadingError, setLoadingError] = useState(null);
+    const [isLoading, loadingError, getReviewsAsync] = useAsync(getReviews);
 
     const sortedItems = items.sort((a,b)=>b[order] - a[order]); //최신순으로 정렬하기
 
@@ -25,18 +25,10 @@ function App(){
         setItems((prevItems)=> prevItems.filter((item)=>item.id !== id));
     }
 
-    const handleLoad = async (options) => {
-        let result;
-        try{
-            setIsLoading(true);
-            setLoadingError(null);
-            result = await getReviews(options);
-        }catch(error){
-            setLoadingError(error);
-            return;
-        }finally{
-            setIsLoading(false);
-        }
+    const handleLoad = useCallback (async (options) => {
+        const result = await getReviewsAsync(options);
+        if(!result) return;
+        
         const { reviews, paging } = result;
 
         if(options.offset === 0){
@@ -46,7 +38,7 @@ function App(){
         }
         setOffset(options.offset + reviews.length);
         setHasNext(paging.hasNext);
-    };
+    }, [getReviewsAsync]);
 
     const handleLoadMore = ()=>{
         handleLoad({ order, offset, limit:LIMIT})
@@ -65,7 +57,7 @@ function App(){
 
     useEffect(()=>{
         handleLoad({order, offset:0, limit: LIMIT});
-    },[order])
+    },[order, handleLoad]);
     
     return (
         <div>
