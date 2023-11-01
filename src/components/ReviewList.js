@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Rating from './Rating';
 import './ReviewList.css';
 import ReviewForm from './ReviewForm';
+import useTranslate from './hooks/useTranslate';
 
 function formatDate(value){
     const date = new Date(value);
@@ -9,6 +10,8 @@ function formatDate(value){
 }
 
 function ReviewListItem({item, onDelete, onEdit}){
+    const t = useTranslate();
+
     const handleDeleteClick = ()=>onDelete(item.id);
 
     const handleEditClick = ()=>{
@@ -23,14 +26,14 @@ function ReviewListItem({item, onDelete, onEdit}){
                 <Rating value={item.rating}/>
                 <p>{formatDate(item.createdAt)}</p>
                 <p>{item.content}</p>
-                <button onClick={handleDeleteClick}>삭제</button>
-                <button onClick={handleEditClick}>수정</button>
+                <button onClick={handleDeleteClick}>{t('delete button')}</button>
+                <button onClick={handleEditClick}>{t('edit button')}</button>
             </div>
         </div>
     )
 }
 
-function ReviewList({items, onDelete}){
+function ReviewList({items, onDelete, onUpdate, onUpdateSuccess}){
     const [editingId, setEditingId] = useState(null);
 
     const handleCancle = ()=>setEditingId(null);
@@ -39,12 +42,25 @@ function ReviewList({items, onDelete}){
         <ul>
         {items.map((item)=>{
             if(item.id === editingId){
-                const {imgUrl, title, rating, content} = item;
-                const initialValues = { title, rating, content };
+                const {id, imgUrl, title, rating, content} = item;
+                const initialValues = { title, rating, content, imgUrl:null };
+
+                const handleSubmit = (formData) => onUpdate(id, formData);
+
+                const handleSubmitSuccess = (review)=>{
+                    onUpdateSuccess(review);
+                    setEditingId(null);
+                }
 
                 return (
                     <li key={item.id}>
-                        <ReviewForm initialValues={initialValues} initialPreview={imgUrl} onCancel={handleCancle}/>
+                        <ReviewForm 
+                        initialValues={initialValues} 
+                        initialPreview={imgUrl} 
+                        onCancel={handleCancle}
+                        onSubmit={handleSubmit}
+                        onSubmitSuccess={handleSubmitSuccess}
+                        />
                     </li>
                 );
             }
